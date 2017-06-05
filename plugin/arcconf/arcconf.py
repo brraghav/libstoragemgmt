@@ -183,9 +183,8 @@ def _parse_arcconf_output(output, component):
                             physical_data.update({temp_list[0] : temp_list[1]})
                     else:
                         physical_data.update({temp_list[0] : temp_list[1]})
-                    #if temp_list[0] == 'Drive Unique ID':
+                    
                     if temp_list[0] == 'SSD':
-                        #list_data.append(list(physical_data), physical_data[0])
                         list_data.append(physical_data.copy())
                         physical_data = {}
                 else:
@@ -797,28 +796,6 @@ class Arcconf(IPlugin):
 
         return search_property(rc_lsm_disks, search_key, search_value)
 
-    @_handle_errors
-    def volume_raid_info(self, volume, flags=Client.FLAG_RSVD):
-        #To be implemented
-        return None
-
-    @_handle_errors
-    def pool_member_info(self, pool, flags=Client.FLAG_RSVD):
-        #To be implemented
-        return None
-
-    @_handle_errors
-    def volume_raid_create_cap_get(self, system, flags=Client.FLAG_RSVD):
-        """
-            To be implemented
-        """
-        return 
-    @_handle_errors
-    def volume_raid_create(self, name, raid_type, disks, strip_size,
-                           flags=Client.FLAG_RSVD):
-        #To be implemented
-        return None
-
 
     @_handle_errors
     def volume_create(self, args, name, size, flags=Client.FLAG_RSVD):
@@ -916,28 +893,6 @@ class Arcconf(IPlugin):
 
         return None
 
-    def volume_enable(self, volume, flags=Client.FLAG_RSVD):
-        return None
-
-    @_handle_errors
-    def volume_ident_led_on(self, volume, flags=Client.FLAG_RSVD):
-        return None
-
-    @_handle_errors
-    def volume_ident_led_off(self, volume, flags=Client.FLAG_RSVD):
-        return None
-
-    @_handle_errors
-    def batteries(self, search_key=None, search_value=None,
-                  flags=Client.FLAG_RSVD):
-        return None
-
-    def _cal_of_lsm_vol(self, lsm_vol):
-        return None
-
-    @_handle_errors
-    def volume_cache_info(self, volume, flags=Client.FLAG_RSVD):
-        return None
 
     def _is_ssd_volume(self, volume):
         ssd_disk_ids = list(d.id for d in self.disks()
@@ -946,18 +901,4 @@ class Arcconf(IPlugin):
         disk_ids = self.pool_member_info(pool)[2]
         return len(set(disk_ids) & set(ssd_disk_ids)) != 0
 
-    @_handle_errors
-    def volume_physical_disk_cache_update(self, volume, pdc,
-                                          flags=Client.FLAG_RSVD):
-        return None
-
-    @_handle_errors
-    def volume_write_cache_policy_update(self, volume, wcp,
-                                         flags=Client.FLAG_RSVD):
-        return None
-
-    @_handle_errors
-    def volume_read_cache_policy_update(self, volume, rcp,
-                                        flags=Client.FLAG_RSVD):
-        return None
 
