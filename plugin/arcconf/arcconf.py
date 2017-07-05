@@ -147,6 +147,7 @@ def _disk_type_of(arcconf_disk):
     return Disk.TYPE_UNKNOWN
 
 
+
 def _disk_status_of(arcconf_disk):
     state = arcconf_disk['state']
 
@@ -486,6 +487,7 @@ class Arcconf(IPlugin):
         disk_name = "%s" % (arcconf_disk['model'])
         disk_type = _disk_type_of(arcconf_disk)
         link_type = disk_type
+
         try:
             blk_size = int(arcconf_disk['physicalBlockSize'])
         except KeyError:
@@ -536,6 +538,7 @@ class Arcconf(IPlugin):
                     hd_disks_num = len(decoded_json['Controller']['Channel'][channel]['HardDrive'])
                     if hd_disks_num > 0:
                         for hd_disk in range(hd_disks_num):
+
                             rc_lsm_disks.append(Arcconf._arcconf_disk_to_lsm_disk(decoded_json['Controller']['Channel'][channel]['HardDrive'][hd_disk], sys_id, cntrl_num))
 
         return search_property(rc_lsm_disks, search_key, search_value)
