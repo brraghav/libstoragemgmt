@@ -147,16 +147,16 @@ def _disk_type_of(arcconf_disk):
     return Disk.TYPE_UNKNOWN
 
 
-def _disk_status_of(arcconf_disk, flag_free):
+
+def _disk_status_of(arcconf_disk):
     state = arcconf_disk['state']
 
-    if state == DRIVE_READY or state == DRIVE_ONLINE:
+    if state == DRIVE_READY:
+        disk_status = Disk.STATUS_OK | Disk.STATUS_FREE
+    elif state == DRIVE_ONLINE:
         disk_status = Disk.STATUS_OK
     else:
         disk_status = Disk.STATUS_OTHER
-
-    if flag_free:
-        disk_status |= Disk.STATUS_FREE
 
     return disk_status
 
@@ -481,17 +481,20 @@ class Arcconf(IPlugin):
         return search_property(lsm_vols, search_key, search_value)
 
     @staticmethod
-    def _arcconf_disk_to_lsm_disk(arcconf_disk, sys_id, ctrl_num, flag_free=False):
+    def _arcconf_disk_to_lsm_disk(arcconf_disk, sys_id, ctrl_num):
         disk_id = arcconf_disk['serialNumber'].strip()
 
         disk_name = "%s" % (arcconf_disk['model'])
         disk_type = _disk_type_of(arcconf_disk)
         link_type = disk_type
-        blk_size = int(arcconf_disk['physicalBlockSize'])
-        blk_count = int(arcconf_disk['numOfUsableBlocks'])
-        print 'Blk size = %d, Blk count  = %d' % (blk_size, blk_count)
 
-        status = _disk_status_of(arcconf_disk, flag_free)
+        try:
+            blk_size = int(arcconf_disk['physicalBlockSize'])
+        except KeyError:
+            blk_size = int(arcconf_disk['blockSize'])
+        blk_count = int(arcconf_disk['numOfUsableBlocks'])
+
+        status = _disk_status_of(arcconf_disk)
         disk_reported_slot = arcconf_disk['fsaSlotNum']
         disk_channel = arcconf_disk['channelID']
         disk_device = arcconf_disk['deviceID']
@@ -535,7 +538,8 @@ class Arcconf(IPlugin):
                     hd_disks_num = len(decoded_json['Controller']['Channel'][channel]['HardDrive'])
                     if hd_disks_num > 0:
                         for hd_disk in range(hd_disks_num):
-                            rc_lsm_disks.append(Arcconf._arcconf_disk_to_lsm_disk(decoded_json['Controller']['Channel'][channel]['HardDrive'][hd_disk], sys_id, cntrl_num, flag_free=True))
+
+                            rc_lsm_disks.append(Arcconf._arcconf_disk_to_lsm_disk(decoded_json['Controller']['Channel'][channel]['HardDrive'][hd_disk], sys_id, cntrl_num))
 
         return search_property(rc_lsm_disks, search_key, search_value)
 
